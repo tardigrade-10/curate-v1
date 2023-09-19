@@ -1,0 +1,5 @@
+1. upload handwritten text image or pdf, the pdf will be stored in Library, and path from Library will be provided for further steps
+2. convert to images
+3. clean and compress the images
+4. extract formatted text from image using OCR
+5. 

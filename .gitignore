@@ -1,0 +1,12 @@
+__pycache__
+
+core/libs/
+core/test_data/
+
+
+# secrets
+.env
+servacc1_key.json
+docai_servacc.json
+
+db.py

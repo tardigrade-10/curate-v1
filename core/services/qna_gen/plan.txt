@@ -1,0 +1,7 @@
+Questions and Assessment Generation
+
+1. upload or write text file for raw info
+2. select format for qna, number, type
+3. provide examples
+4. generate
+

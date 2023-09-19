@@ -1,0 +1,7 @@
+numpy
+pytz
+google-cloud-vision
+python-dotenv
+opencv-python
+matplotlib
+openai
