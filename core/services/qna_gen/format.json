@@ -1,0 +1,7 @@
+{
+    "mcq1": {
+        "q": "What is the capital of India?",
+        "c": ["New Delhi", "Mumbai", "Pune", "Kolkata"],
+        "a": "New Delhi"
+    }
+}

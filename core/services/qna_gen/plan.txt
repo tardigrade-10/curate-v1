@@ -3,5 +3,11 @@ Questions and Assessment Generation
 1. upload or write text file for raw info
 2. select format for qna, number, type
 3. provide examples
-4. generate
+4. generate question - 
+
+Types -
+Single correct 
+1. MCQ- informative:  for ex. what is the capital of India? New Delhi
+2. MCQ- numerical: solve for x, `x^2 + 2x + 2 = 10`? x = 2
+3. 
 
