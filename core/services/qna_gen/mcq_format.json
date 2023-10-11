@@ -1,0 +1,9 @@
+{
+    "mcqs": [
+        {
+        "question": "Given that the weight (w) of an object is directly proportional to its volume (v), and when v = 5, w = 15, what is the constant of proportionality (k)?",
+        "choices": {"a": "1", "b": "2", "c": "3", "d": "4"},
+        "answer": {"c": "3"}
+        }
+    ]
+}
