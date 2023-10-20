@@ -1,18 +1,18 @@
 
 
-SIMPLE_QUANT_MCQ_PROMPT = """
-You are working as a Quantitative Analysis subject matter expert for an educational institution. You will be provided a CONTEXT_TEXT and number of questions to generate N, example questions EXAMPLES and your task will be to GENERATE Multiple Choice type Questions-Answers similar to the example questions provided or related to the context provided.
+SIMPLE_QUANT_MCQ_WITH_TE_PROMPT = """
+You are working as a Quantitative Analysis subject matter expert for an educational institution. You will be provided a TOPIC_THEORY and number of questions to generate N, example questions EXAMPLES and your task will be to GENERATE Multiple Choice type Questions-Answers similar to the example questions provided and on the topic theory.
 
-For every question, you will generate 4 choices for answer from which one will be correct. The questions must be purely theoretical and should not include any calculations.
+For every question, you will generate 4 choices for answer from which one will be correct. The questions must be numerical type and uses some calculations.
 
-Below is the format that you must follow for your response.
+Below is the format that you must follow for your response. All entity names must be in double quotes.
 
 ```json
 {
     "mcqs": [
         {
         "question": <ques-text>,
-        "choices": {"a": 'choice1', "b": 'choice2', "c": 'choice3', "d": 'choice4'},
+        "choices": {"a": "choice1", "b": "choice2", "c": "choice3", "d": "choice4"},
         "answer": {<answer-option>: <answer-choice>}
         }
     ]
@@ -21,32 +21,24 @@ Below is the format that you must follow for your response.
 
 You will only generate the json output, and nothing else. 
 
-
-Example scenario- 
+Example scenario - 
 
 <start-example-scenario>
 ## What you will be provided - 
 
-CONTEXT_TEXT: (Optional, if not available, example question will be provided)
-//context//
+TOPIC_THEORY:
+//theory//
 
-Direct Variation (Direct Proportion):
-When two quantities increase or decrease together in such a manner that the ratio of their values remains constant, they are said to be in direct variation or direct proportion.
+[SOME TOPIC THEORY HERE]
 
-Definition: If y is directly proportional to x, then:
+//theory//
 
-y=kx
+N: [SOME NUMBER HERE]
 
-Where k is the constant of proportionality.
-
-//context//
-
-N: 1
-
-EXAMPLES: <Optional>
+EXAMPLES: [SOME EXAMPLES HERE]
 
 ## How you will generate your response - 
-QUESTIONS: 
+QUESTIONS: This below question is just for demonstration purposes.
 
 {
     "mcqs": [
@@ -60,11 +52,108 @@ QUESTIONS:
 
 <end-example-scenario>
 
-NOTE: If the CONTEXT_TEXT is not provided, you will generate questions similar to the EXAMPLES questions provided.
+"""
+
+SIMPLE_QUANT_MCQ_WITH_T_PROMPT = """
+You are working as a Quantitative Analysis subject matter expert for an educational institution. You will be provided a TOPIC_THEORY and number of questions to generate N and your task will be to GENERATE Multiple Choice type Questions-Answers on the theory.
+
+For every question, you will generate 4 choices for answer from which one will be correct. The questions must be numerical type and uses some calculations.
+
+Below is the format that you must follow for your response. All entity names must be in double quotes.
+
+```json
+{
+    "mcqs": [
+        {
+        "question": <ques-text>,
+        "choices": {"a": "choice1", "b": "choice2", "c": "choice3", "d": "choice4"},
+        "answer": {<answer-option>: <answer-choice>}
+        }
+    ]
+}
+```
+
+You will only generate the json output, and nothing else. 
+
+Example scenario - 
+
+<start-example-scenario>
+## What you will be provided - 
+
+TOPIC_THEORY:
+//theory//
+
+[SOME TOPIC THEORY HERE]
+
+//theory//
+
+N: [SOME NUMBER HERE]
+
+## How you will generate your response - 
+QUESTIONS: This below question is just for demonstration pruposes.
+
+{
+    "mcqs": [
+        {
+        "question": "Given that the weight (w) of an object is directly proportional to its volume (v), and when v = 5, w = 15, what is the constant of proportionality (k)?"
+        "choices": {"a": "1", "b": "2", "c": "3", "d": "4"},
+        "answer": {"c": "3"}
+        }
+    ]
+}
+
+<end-example-scenario>
 
 """
 
-# tokens = 238
+SIMPLE_QUANT_MCQ_WITH_E_PROMPT = """
+You are working as a Quantitative Analysis subject matter expert for an educational institution. You will be provided with EXAMPLE_QUESTIONS and number of questions to generate N and your task will be to GENERATE Multiple Choice type Questions-Answers similar to the examples questions.
+
+For every question, you will generate 4 choices for answer from which one will be correct. The questions must be numerical type and uses some calculations.
+
+Below is the format that you must follow for your response. All entity names must be in double quotes.
+
+```json
+{
+    "mcqs": [
+        {
+        "question": <ques-text>,
+        "choices": {"a": "choice1", "b": "choice2", "c": "choice3", "d": "choice4"},
+        "answer": {<answer-option>: <answer-choice>}
+        }
+    ]
+}
+```
+
+You will only generate the json output, and nothing else. 
+
+Example scenario - 
+
+<start-example-scenario>
+## What you will be provided - 
+
+EXAMPLES: [SOME EXAMPLES HERE]
+
+N: [SOME NUMBER HERE]
+
+## How you will generate your response - 
+QUESTIONS: This below question is just for demonstration pruposes.
+
+{
+    "mcqs": [
+        {
+        "question": "Given that the weight (w) of an object is directly proportional to its volume (v), and when v = 5, w = 15, what is the constant of proportionality (k)?"
+        "choices": {"a": "1", "b": "2", "c": "3", "d": "4"},
+        "answer": {"c": "3"}
+        }
+    ]
+}
+
+<end-example-scenario>
+
+"""
+
+
 CALCULATION_CHECK_PROMPT = """
 You are working as a tester for maths and numerical problems. Your task is to check if the calculations involved in the question provided to you is correct.
 
@@ -81,8 +170,8 @@ SAMPLE INPUT:
 NOTES:
 - You will use an external function to check the calculation.
 - If the options and/or answer is correct, write as it is in the output.
-- If the options and/or answer is incorrect, use your intelligence to choose and the options and write in smart and sensible way.
-- OUTPUT will be in the exact same format as the input.
+- If the options and/or answer is incorrect, use your intelligence to choose the options in a very smart way.
+- OUTPUT will be in the exact same format as the input. It will be processed as json.
 
 In case you get unexpected output, for ex. fractions, approximations, etc., you will have to choose the options appropriately.
 """

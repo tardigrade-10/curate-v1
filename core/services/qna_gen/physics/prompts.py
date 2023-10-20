@@ -9,11 +9,11 @@ Below is the format that you must follow for your response.
 
 ```json
 {
-    "mcq": [
+    "mcqs": [
         {
         "question": <ques-text>,
-        "choices": [<choices for answer>],
-        "answer": <answer-text>
+        "choices": {"a": "choice1", "b": "choice2", "c": "choice3", "d": "choice4"},
+        "answer": {<answer-option>: <answer-choice>}
         }
     ]
 }
@@ -37,7 +37,7 @@ these conditions affect all six sides simultaneously.
 
 //context//
 
-N: 1
+N: 2
 
 EXAMPLES: <Optional>
 
@@ -48,13 +48,13 @@ QUESTIONS:
     "mcqs": [
         {
         "question": "The purpose of the passage is to present",
-        "choices": ["a personal observation.", "a solution to a problem.", "actual information.", "opposing scientific theories."],
-        "answer": "actual information."
+        "choices": {"a": "a personal observation.", "b": "a solution to a problem.", "c": "actual information.", "d": "opposing scientific theories."},
+        "answer": {"c": "actual information"}
         },
         {
         "question": "Where does the shape of crystal is determinded?",
-        "choices": ["Ground", "Space", "Upper Atmospere", "Jungle"],
-        "answer": "Upper Atmosphere"
+        "choices": {"a": "Ground", "b": "Space", "c": "Upper Atmospere", "d": "Jungle"},
+        "answer": {"c": "Upper Atmosphere"}
         }
     ]
 }
@@ -74,11 +74,11 @@ Below is the format that you must follow for your response to generate questions
 
 ```json
 {
-    "mcq": [
+    "mcqs": [
         {
         "question": <ques-text>,
-        "choices": [<choices for answer>],
-        "answer": <answer-text>
+        "choices": {"a": "choice1", "b": "choice2", "c": "choice3", "d": "choice4"},
+        "answer": {<answer-option>: <answer-choice>}
         }
     ]
 }
@@ -114,7 +114,7 @@ Final Velocity (v) squared = Initial Velocity (u) squared + 2 x Acceleration (a)
 
 //context//
 
-N: 1
+N: 2
 
 EXAMPLES: <Optional>
 
@@ -126,13 +126,13 @@ QUESTIONS:
     "mcqs": [
         {
         "question": "An object starts from rest and accelerates uniformly at 2 m/s² for 5 seconds. How far does it travel in this time?",
-        "choices": ["10 m", "25 m", "50 m", "75 m"],
-        "answer": "25 m"
+        "choices": {"a": "10 m", "b": "25 m", "c": "50 m", "d": "75 m"},
+        "answer": {"b": "25 m"}
         },
         {
         "question": "A car moving with a velocity of 20 m/s is uniformly decelerated at a rate of 4 m/s² until it comes to a stop. How far does the car travel during this deceleration?",
-        "choices": ["50 m", "25 m", "75 m", "100 m"],
-        "answer": "50 m"
+        "choices": {"a": "50 m", "b": "25 m", "c": "75 m", "d": "100 m"},
+        "answer": {"a": "50 m"}
         }
     ]
 }
@@ -144,29 +144,23 @@ This was the example scenario. Actual values can be widely different, so use you
 
 
 CALCULATION_CHECK_PROMPT = """
-You are working as a tester for physics based numerical problems. Your task is to check if the calculations involved in the questions provided to you is correct.
+You are working as a tester for physics based numerical problems. Your task is to check if the calculations involved in the question provided to you is correct.
 
-If a question and the associated options and answer is correct, write as it is in the output.
-If the question, or associated options or answer is incorrect, rewrite the corrected question and answer, in the same format. 
+SAMPLE INPUT:
 
-
-This is how you will get the input - 
-INPUT: 
+```json
 {
-    "mcqs": [
-        {
-        "question": "An object starts from rest and accelerates uniformly at 2 m/s² for 5 seconds. How far does it travel in this time?",
-        "choices": ["10 m", "25 m", "50 m", "75 m"],
-        "answer": "25 m"
-        },
-        {
-        "question": "A car moving with a velocity of 20 m/s is uniformly decelerated at a rate of 4 m/s² until it comes to a stop. How far does the car travel during this deceleration?",
-        "choices": ["50 m", "25 m", "75 m", "100 m"],
-        "answer": "50 m"
-        }
-    ]
+"question": "An object starts from rest and accelerates uniformly at 2 m/s² for 5 seconds. How far does it travel in this time?",
+"choices": {"a": "10 m", "b": "25 m", "c": "50 m", "d": "75 m"},
+"answer": {"b": "25 m"}
 }
+```
 
-OUTPUT: (correct and rewrite the questions. Change the options if you have to and pick the right answer by cross checking with provided helper function)
+NOTES:
+- You will use an external function to check the calculation.
+- If the options and/or answer is correct, write as it is in the output.
+- If the options and/or answer is incorrect, use your intelligence to choose the options in a very smart way.
+- OUTPUT will be in the exact same format as the input. It will be processed as json.
 
+In case you get unexpected output, for ex. fractions, approximations, etc., you will have to choose the options appropriately.
 """

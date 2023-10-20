@@ -65,3 +65,37 @@ def get_results_from_wolfram_cloud(query):
     result = session.evaluate(wlexpr(query))
 
     return result
+
+
+
+function_definitions = {
+    "get_results_from_wolfram_alpha": {
+        "name": "get_results_from_wolfram_alpha",
+        "description": """This function uses wolfram alpha endpoint that Understands natural language queries about entities in chemistry, physics, geography, history, art, astronomy, and more.\n- Performs mathematical calculations, date and unit conversions, formula solving, etc.\n- Convert inputs to simplified keyword queries whenever possible (e.g. convert \"how many people live in France\" to \"France population\").\n- Use ONLY single-letter variable names, with or without integer subscript (e.g., n, n1, n_1).\n- Use named physical constants (e.g., 'speed of light') without numerical substitution.\n- Include a space between compound units (e.g., \"Ω m\" for \"ohm*meter\").\n- To solve for a variable in an equation with units, consider solving a corresponding equation without units; exclude counting units (e.g., books), include genuine units (e.g., kg).""",
+        "parameters": {
+            "type": "object",
+            "properties": {
+            "queries": {
+                "type": "string",
+                "description": """curated natural language queries for wolfram alpha
+                for example: "distance from earth to mars; current population of new delhi"."""
+            }
+            }
+        },
+            "required": ["queries"]
+        },
+    "get_results_from_wolfram_cloud":{
+        "name": "get_results_from_wolfram_cloud",
+        "description": """Use this function for problems solvable with Wolfram Language code.""",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "queries": {
+                    "type": "string",
+                    "description": """the input wolfram language query for mathematical calculations in string. ONLY proper wolfram language queries are supported. Format for Query: "a = Solve[aCoeff1*aVar == Var1 - Offset1 && aCoeff2*aVar == Var1 + Offset2, {aVar, Var1}][[1, 1, 2]]"."""
+                }
+            }
+        },
+        "required": ["queries"]
+    }
+}
