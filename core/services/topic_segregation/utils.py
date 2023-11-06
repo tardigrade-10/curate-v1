@@ -1,4 +1,5 @@
-
+import urllib3
+from xml.dom.minidom import parseString
 
 def add_dicts(a, b):
     return {k: a[k] + b[k] for k in a.keys() & b.keys()}
@@ -22,3 +23,21 @@ def calculate_cost_gpt4_8k(token_usage):
 #     encoding = tiktoken.get_encoding(encoding_name)
 #     num_tokens = len(encoding.encode(string))
 #     return num_tokens
+
+
+
+def get_google_news_results(term, count):
+    http = urllib3.PoolManager()
+    results = []
+    response = http.request('GET', 'http://news.google.com/news?q=%s&output=rss' % term)
+    obj = parseString(response.data.decode('utf-8'))
+    items = obj.getElementsByTagName('item')  # Get each item
+    for item in items[:count]:
+        title, link = '', ''
+        for node in item.childNodes:
+            if node.nodeName == 'title':
+                title = node.childNodes[0].data
+            elif node.nodeName == 'link':
+                link = node.childNodes[0].data
+        results.append((title, link))
+    return results

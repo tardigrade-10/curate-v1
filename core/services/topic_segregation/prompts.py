@@ -31,7 +31,7 @@ NOTE: You must only response with the json output, and nothing else.
 """
 
 SIMPLE_TS_WITH_REF_PROMPTS = """
-You will be provided with a RAW_TEXT corpus containing some useful educational information. Your task is to segregate the text into different topics.
+You will be provided with a RAW_TEXT in list with some numerical index for every sentence containing some useful educational information. Your task is to segregate the text into different topics.
 
 For example, if you are given the raw text from past 5 days news scraping, your task will be to segregate the text into topics like "Politics", "Sports", "Business", etc. as per the reference provided to you.
 
@@ -52,8 +52,8 @@ REFERENCE:
 
 OUTPUT FORMAT:
 {
-    "topic_0": ["list of scraped sentences or paragraphs related to topic_0"],
-    "topic_1": ["list of scraped sentences or paragraphs related to topic_1"]
+    "topic_0": ["list of index of sentences or paragraphs related to topic_0"],
+    "topic_1": ["list of index of sentences or paragraphs related to topic_1"]
 }
 
 
