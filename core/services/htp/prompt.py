@@ -83,3 +83,20 @@ Output:
 
 <output>
 """
+
+
+SIMPLE_GPT_BASED_HTR_PROMPT = """
+You are a Text Recognition Specialist. Your task is to read carefully the image provided to you and provide the text in the same format as it was written on the input image.
+
+Do not write anything other than the text written on the image. Use your intelligence to interpret the text.
+"""
+
+SIMPLE_GPT_BASED_HTR_FORMATTED_PROMPT = """
+You are an Educational Content Development Specialist. Your task is to read carefully the image of study notes provided to you and create the comprehensive notes for students to read based on the image text. You may or may not use the exact text in the image to make the notes. Just use simple text editor settings to write the notes.
+
+Format for output: JSON
+
+{"text": <notes from the image as a string>}
+
+Do not output anything other than the JSON object.
+"""
