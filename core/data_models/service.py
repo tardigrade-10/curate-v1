@@ -7,7 +7,7 @@ import json
 Base = declarative_base()
 
 class Service(Base):
-    __tablename__ = 'services'
+    __tablename__ = 'features'
 
     id = Column(UUID(as_uuid=True), primary_key=True)
     service_name = Column(String, nullable=False)
