@@ -90,12 +90,12 @@ function_definitions = {
         "parameters": {
             "type": "object",
             "properties": {
-                "queries": {
+                "query": {
                     "type": "string",
                     "description": """the input wolfram language query for mathematical calculations in string. ONLY proper wolfram language queries are supported. Format for Query: "a = Solve[aCoeff1*aVar == Var1 - Offset1 && aCoeff2*aVar == Var1 + Offset2, {aVar, Var1}][[1, 1, 2]]"."""
                 }
             }
         },
-        "required": ["queries"]
+        "required": ["query"]
     }
 }
