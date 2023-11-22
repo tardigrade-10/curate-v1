@@ -88,6 +88,10 @@ Output:
 SIMPLE_GPT_BASED_HTR_PROMPT = """
 You are a Text Recognition Specialist. Your task is to read carefully the image provided to you and provide the text in the same format as it was written on the input image.
 
+Format for output: JSON
+
+{"text": <notes from the image as a string>}
+
 Do not write anything other than the text written on the image. Use your intelligence to interpret the text.
 """
 
