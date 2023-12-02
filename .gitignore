@@ -1,4 +1,5 @@
 __pycache__
+.pytest_cache
 
 core/libs/
 core/test_data/
@@ -10,3 +11,4 @@ servacc1_key.json
 docai_servacc.json
 
 db.py
+storage

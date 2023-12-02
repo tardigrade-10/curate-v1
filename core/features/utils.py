@@ -1,9 +1,26 @@
 import os
 import requests
 import fitz  # import the bindings PyMuPDF
+import aiofiles
+import asyncio 
+import base64
 
 from dotenv import load_dotenv
 load_dotenv()
+
+def process_for_json(text):
+    # Find the index of the first '{' and the last '}'
+    start_index = text.find('{')
+    end_index = text.rfind('}')
+
+    # Extract the text between the first '{' and the last '}'
+    if start_index != -1 and end_index != -1 and end_index > start_index:
+        extracted_text = text[start_index:end_index + 1]
+
+    else:
+        extracted_text = ''
+
+    return extracted_text
 
 
 def calculate_cost_gpt4_8k(token_usage):
@@ -47,12 +64,49 @@ def pdf_to_images(pdf_path, output_folder, start, end, dpi=300, zoom = 1):
 
     os.makedirs(output_folder, exist_ok=True)  # create output folder
 
-    if start > end > l:
-        raise ValueError("Invalid page range")
+    if start > end or end > l:
+        raise ValueError(f"Invalid page range. Document has only {l} pages.")
 
+    file_paths = []
     for i in range(start-1, end):  # iterate through the pages
         pix = doc[i].get_pixmap(dpi = 200)  # render page to an image
-        pix.save(os.path.join(output_folder, "page-%i.png" % i))  # store image as a PNG
+        img_path = os.path.join(output_folder, f"page-{i+1}.png")
+        pix.save(img_path)  # store image as a PNG
+        file_paths.append(img_path)
 
     print("Total pages in document:", l)
+    print("start_page:", start, "end_page:", end)
     print("Total images generated:", end-start+1)
+
+    return file_paths
+
+
+# Function to encode the image
+def encode_image(image_path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+
+
+def encode_images(image_paths, verbose = False):
+
+    enc_dict = {}
+    for path in image_paths:
+        enc_dict[os.path.basename(path)] = encode_image(path)
+
+    if verbose:
+        print("Total images:", len(image_paths))
+
+    return enc_dict
+
+
+
+class ServiceCost:
+    def __init__(self):
+        pass
+
+    def htp_service(self, total_images):
+        return total_images * 2.0
+
+
+    
+

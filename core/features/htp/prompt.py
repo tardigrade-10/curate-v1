@@ -1,4 +1,4 @@
-HTR_MARKDOWN_OUTPUT_PROMPT = """
+HTP_MARKDOWN_OUTPUT_PROMPT = """
 You are given an OCR model result as list of extracted strings, and your task is to provide the markdown formatted text ideally as it was written on the API input image.
 
 Add <output> before and after your output.
@@ -85,7 +85,7 @@ Output:
 """
 
 
-SIMPLE_GPT_BASED_HTR_PROMPT = """
+SIMPLE_GPT_BASED_HTP_PROMPT = """
 You are a Text Recognition Specialist. Your task is to read carefully the image provided to you and provide the text in the same format as it was written on the input image.
 
 Format for output: JSON
@@ -95,7 +95,7 @@ Format for output: JSON
 Do not write anything other than the text written on the image. Use your intelligence to interpret the text.
 """
 
-SIMPLE_GPT_BASED_HTR_FORMATTED_PROMPT = """
+SIMPLE_GPT_BASED_HTP_FORMATTED_PROMPT = """
 You are an Educational Content Development Specialist. Your task is to read carefully the image of study notes provided to you and create the comprehensive notes for students to read based on the image text. You may or may not use the exact text in the image to make the notes. Just use simple text editor settings to write the notes.
 
 Format for output: JSON
