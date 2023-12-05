@@ -6,8 +6,7 @@ import os
 import time
 import aiofiles
 
-from core.features.htp.htp import htp_process, async_htp_process
-from core.features.htp.htp_class import HTPService
+from core.features.htp import HTPService
 from core.features.utils import pdf_to_images
 
 router = APIRouter(

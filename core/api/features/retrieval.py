@@ -7,7 +7,7 @@ import time
 import aiofiles
 import json
 
-from core.features.retrieval.retrieval_class import RetrievalTextService, RetrievalImageService
+from core.features.retrieval import RetrievalTextService, RetrievalImageService
 from core.features.utils import pdf_to_images
 
 router = APIRouter(
