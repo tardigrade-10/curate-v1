@@ -62,8 +62,6 @@ def pdf_to_images(pdf_path, output_folder, start, end, dpi=300, zoom = 1):
     doc = fitz.open(fname)  # open document
     l = len(doc)
 
-    os.makedirs(output_folder, exist_ok=True)  # create output folder
-
     if start > end or end > l:
         raise ValueError(f"Invalid page range. Document has only {l} pages.")
 
@@ -92,12 +90,9 @@ def encode_images(image_paths, verbose = False):
     enc_dict = {}
     for path in image_paths:
         enc_dict[os.path.basename(path)] = encode_image(path)
-
     if verbose:
         print("Total images:", len(image_paths))
-
     return enc_dict
-
 
 
 class ServiceCost:
@@ -105,7 +100,20 @@ class ServiceCost:
         pass
 
     def htp_service(self, total_images):
+        # INR 2/- per page 
         return total_images * 2.0
+
+    def retrieval_text_service(self, input_len: int, queries_count: int):
+        # INR 1 per 1000 chars + 10% of the cost of input per query
+        base = input_len*0.0003
+        return round(base *(1 + 0.1 * queries_count), 2)
+    
+    def retrieval_image_service(self, total_image: int, queries_count: int):
+        # INR 2 per image + 10% of the cost of input per query
+        base = total_image*2
+        return round(base *(1 + 0.1 * queries_count), 2)
+
+
 
 
     

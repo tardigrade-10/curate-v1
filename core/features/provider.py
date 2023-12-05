@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 client = OpenAI()
-async_client = AsyncOpenAI(timeout=30)
+async_client = AsyncOpenAI()
 
 creator = client.chat.completions.create
 async_creator = async_client.chat.completions.create
