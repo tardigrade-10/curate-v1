@@ -3,12 +3,14 @@ __pycache__
 
 core/libs/
 core/test_data/
+core/features/experimental
 
 
 # secrets
 .env
 servacc1_key.json
 docai_servacc.json
+application_default_credentials.json
 
 db.py
 storage
