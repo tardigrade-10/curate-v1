@@ -1,6 +1,7 @@
 import os
 import re
 import time
+import uuid
 import json
 import asyncio
 from tqdm import tqdm
@@ -15,6 +16,8 @@ class AssignmentCheck:
 
     def __init__(self) -> None:
         self.duplicates = []
+        self.feedback_cache = {} # str(qna_dict) to remarks dict mapping
+        self.report = []
 
 
     def question_or_answer_cell(self, s):
@@ -68,51 +71,68 @@ class AssignmentCheck:
         provide obtained marks and feedback
         """
 
-        conversation = [{"role": "system", "content": SIMPLE_ASSIGNMENT_CHECK_PROMPT}]
-        user_input = f"""
-        
-        {qna_dict}
+        if str(qna_dict) in self.feedback_cache.keys():
+            output = self.feedback_cache[str(qna_dict)]
+            output_source = "cache"
+            token_usage = {'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0}
 
-        """
-        user_message = {'role': 'user', 'content': user_input}
-        conversation.append(user_message)
+        else:
+            conversation = [{"role": "system", "content": SIMPLE_ASSIGNMENT_CHECK_PROMPT}]
+            user_input = f"""
+            
+            {qna_dict}
 
-        response = await async_creator(
-            **text_model_defaults,
-            messages=conversation
-        )    
-        response = response.model_dump()
-        output = response["choices"][0]["message"]["content"]
-        total_usage = response["usage"]
-        return {"output": output, "tag": tag, "qna_dict":qna_dict, "total_usage": total_usage}
+            """
+            user_message = {'role': 'user', 'content': user_input}
+            conversation.append(user_message)
+
+            response = await async_creator(
+                **text_model_defaults,
+                messages=conversation
+            )    
+            response = response.model_dump()
+            output = response["choices"][0]["message"]["content"]
+            token_usage = response["usage"]
+            output_source = "gen"
+            self.feedback_cache[str(qna_dict)] = output
+
+        self.report.append({'id': str(uuid.uuid4()), "tag": tag, "output_source": output_source, "token_usage": token_usage})
+        return {
+            "output": output,
+            "output_source": output_source,
+            "tag": tag,
+            "qna_dict":qna_dict,
+            "token_usage": token_usage
+            }
 
 
-    async def notebook_check(self, file, qnas, marks):
+    async def notebook_check(self, file, qnas, context):
 
         """
         This function takes the set of questions and answers and provide a dict with remarks of all questions
         """
 
-        total_usage = {'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0}
+        token_usage = {'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0}
         remarks = {}
         tasks = []
-        for i in range(1, len(marks)+1):
+        for i in range(1, len(context)+1):
             qna_dict = {
                 "question": qnas[f"q{i}"],
+                "description": context[f"q{i}"]['description'],
                 "solution": qnas[f"a{i}"],
-                "max_marks": marks[f"q{i}"]
+                "max_marks": context[f"q{i}"]['max_marks']
             }
             task = self.question_answer_check(qna_dict=qna_dict, tag=f"q{i}")
             tasks.append(task)
         results = await asyncio.gather(*tasks)
         
         for result in results:
-            output, usage, tag, qna_dict = json.loads(result['output']), result['total_usage'], result['tag'], result['qna_dict']
-            total_usage = add_dicts(total_usage, usage)
+            output, usage, tag, qna_dict = json.loads(result['output']), result['output_source'], result['token_usage'], result['tag'], result['qna_dict']
+            token_usage = add_dicts(token_usage, usage)
             qna_dict.update(output)
             remarks[tag] = qna_dict
 
-        return {file: remarks}, total_usage
+        return {file: remarks}, token_usage
     
 
     async def batch_assessment_check(self, path, remarks_filename="remarks.json", check_duplicates: bool=False):
@@ -128,17 +148,16 @@ class AssignmentCheck:
         total_tokens = {'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0}
         final_remarks = {}
 
-        remarks_path = "/"
         if os.path.isdir(path):
             print("GOT A DIR")
             file_paths = [os.path.join(path, _file) for _file in os.listdir(path) if _file.endswith('.ipynb')]
-            marks_file = next((os.path.join(path, _file) for _file in os.listdir(path) if _file == "marks.json"), None)
+            context_file = next((os.path.join(path, _file) for _file in os.listdir(path) if _file == "context.json"), None)
 
-            if marks_file is not None:
-                with open(marks_file, 'r') as f:
-                    marks = json.load(f)
+            if context_file is not None:
+                with open(context_file, 'r') as f:
+                    context = json.load(f)
             else:
-                raise FileNotFoundError("marks.json file not found")
+                raise FileNotFoundError("context.json file not found")
 
             print(f"GOT {len(file_paths)} notebooks")
             files_and_qnas = {os.path.basename(file_path): self.qna_extraction(file_path) for file_path in file_paths}
@@ -155,7 +174,7 @@ class AssignmentCheck:
 
         tasks = []
         for file, qna in tqdm(files_and_qnas.items()):
-            task = self.notebook_check(file, qna, marks)
+            task = self.notebook_check(file, qna, context)
             tasks.append(task)
         results = await asyncio.gather(*tasks)
         
@@ -182,7 +201,7 @@ class AssignmentCheck:
             with open(os.path.join(results_path, 'duplicates.json'), 'w') as f:
                 dup_json = {'duplicates': self.duplicates}
                 f.write(json.dumps(dup_json))
-        return total_tokens, gpt_cost
+        return total_tokens, gpt_cost, self.report
     
 
     def duplicates_checker(self, content: Dict):
