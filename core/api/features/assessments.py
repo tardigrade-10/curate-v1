@@ -57,7 +57,7 @@ async def assignment_assess(
     """
 
     start_time = time.time()
-    total_usage, gpt_cost, run_report = await assessment_check.batch_assessment_check(
+    total_usage, gpt_cost, run_report, api_call_count = await assessment_check.batch_assessment_check(
                                                         path=path,
                                                         check_duplicates=check_duplicates
                                                         )
@@ -69,7 +69,9 @@ async def assignment_assess(
         "total_usage": total_usage,
         "gpt_cost": gpt_cost,
         "latency": latency,
-        "run_report": run_report
+        "report_count": len(run_report),
+        "run_report": run_report,
+        "api_call_count": api_call_count
     }
 
     return JSONResponse(content=response)
