@@ -1,13 +1,15 @@
 import os
+import io
 import re
+import csv
 import json
 import asyncio
 from tqdm import tqdm
-from typing import List, Dict, Any, Tuple, Union
+from typing import Dict
 
 from core.features.assessments.prompts import SIMPLE_ASSIGNMENT_CHECK_PROMPT
 from core.features.utils import add_dicts, calculate_cost_gpt4_turbo
-from core.features.provider import creator, async_creator, text_model_defaults
+from core.features.provider import async_creator, text_model_defaults
 
 
 class AssignmentCheck:
@@ -15,6 +17,7 @@ class AssignmentCheck:
     def __init__(self) -> None:
         self.duplicates = []
         self.gpt_report = []
+        # self.context = {}
 
     def question_or_answer_cell(self, s: str):
 
@@ -39,7 +42,7 @@ class AssignmentCheck:
         return bool(re.match(pattern, s))
 
 
-    def qna_extraction(self, file_path: str):
+    def qna_extraction(self, file_path: str, context: Dict):
         """
         Function to extracts question and answers from the jupyter notebook
         cells with #qn tag and #an tag
@@ -55,9 +58,15 @@ class AssignmentCheck:
         cells = nb['cells']
         qnas = {}
         for cell in cells:
-            if self.question_or_answer_cell(cell['source'][0]):
-                qnas[cell['source'][0].strip('#\n')] = "".join(cell['source'][1:])  
-        return qnas
+            if cell['source'] and self.question_or_answer_cell(cell['source'][0]):
+                qnas[cell['source'][0].strip('#\n')] = "".join(cell['source'][1:])
+
+        final_qnas = {}
+        for key in context.keys():
+            final_qnas[key] = qnas.get(key)
+            final_qnas[key.replace('q', 'a')] = qnas.get(key.replace('q', 'a'))
+
+        return final_qnas
 
 
     async def question_answer_check(self, qna_dict: Dict, tag: str):
@@ -123,7 +132,7 @@ class AssignmentCheck:
             "output": output,
             "id": id,
             "token_usage": token_usage
-            }
+        }
 
 
     async def notebook_check(self, file, qnas, context):
@@ -190,7 +199,9 @@ class AssignmentCheck:
                 raise FileNotFoundError("context.json file not found")
 
             print(f"GOT {len(file_paths)} notebooks in total")
-            files_and_qnas = {os.path.basename(file_path): self.qna_extraction(file_path) for file_path in file_paths}
+            files_and_qnas = {os.path.basename(file_path): self.qna_extraction(file_path, context) for file_path in file_paths}
+            print(files_and_qnas)
+            # print("GOT QNAS:", len(files_and_qnas))
             reformed, duplicate_qnas = self.qna_reformation(files_qnas=files_and_qnas, context=context, find_duplicates=True)
             # print("DUPLICATE QNAS", duplicate_qnas)
             
@@ -266,9 +277,12 @@ class AssignmentCheck:
         json_remarks = json.dumps(final_remarks, indent=4)
         with open(os.path.join(results_path, remarks_filename), 'w') as f:
             f.write(json_remarks)
-        
-        gpt_cost = calculate_cost_gpt4_turbo(total_tokens)
 
+        csv_remarks = self.json_to_csv_remarks(remarks = final_remarks, context = context)
+        with open(os.path.join(results_path, remarks_filename.replace('.json', '.csv')), 'w') as f:
+            f.write(csv_remarks)
+
+        gpt_cost = calculate_cost_gpt4_turbo(total_tokens)
         if check_duplicates:
             # saving the duplicate notebooks and qnas info  
             with open(os.path.join(results_path, 'duplicates.json'), 'w') as f:
@@ -296,15 +310,15 @@ class AssignmentCheck:
             l = len(qnas)
             for i in range(1, l//2 + 1):
                 reformed[file + "?" + f"q{i}"] = {
-                                        "question": qnas[f"q{i}"],
+                                        "question": qnas.get(f"q{i}"),
                                         "description": context[f"q{i}"]['description'],
                                         "max_marks": context[f"q{i}"]['max_marks'],
-                                        "solution": qnas[f"a{i}"]
+                                        "solution": qnas.get(f"a{i}")
                                     }
         
-        # finding duplicates      
+        # finding duplicates
         """
-        Duplicates structure - {qna-id: null if not similar qna, qna-d: [qna-ids of all similar qnas]}        
+        Duplicates structure - {qna-id: null if not similar qna, qna-id: [qna-ids of all similar qnas]}
         """
         if find_duplicates:
             qna_to_ids = {}
@@ -395,11 +409,36 @@ class AssignmentCheck:
                         traverse through each notebook cell to find where to place the
                         remark cell, place and then break this loop
                         """
-                        if tag == cell['source'][0].strip('#\n'):
+                        if cell['source'] and tag == cell['source'][0].strip('#\n'):
                             nb['cells'].insert(i+1, to_add)
                             break
 
                 checked_nb_path = os.path.join(check_nb_folder_path, file_name)
                 with open(checked_nb_path, 'w') as outfile:
                     outfile.write(json.dumps(nb, indent=4))
+
+    
+    def json_to_csv_remarks(self, remarks: Dict, context: Dict):
+
+        questions = []
+        question_keys = []
+        for q, data in context.items():
+            question_keys.append(q)
+            questions.append(f'{q} ({data["max_marks"]})')
+        questions = sorted(questions)
+        question_keys = sorted(question_keys)
+
+        # Create CSV data
+        output = io.StringIO()
+        writer = csv.writer(output)
+
+        # Writing header
+        writer.writerow(['file_name'] + questions)
+
+        # Writing rows for each file
+        for file_name, file_data in remarks.items():
+            row = [file_name] + [file_data.get(q, {'marks': None})['marks'] for q in question_keys]
+            writer.writerow(row)
+
+        return output.getvalue()
 

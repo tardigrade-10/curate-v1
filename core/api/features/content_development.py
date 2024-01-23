@@ -68,6 +68,22 @@ async def python_curriculum_development(title, scope, duration_in_hours, num_mod
 @router.post("/python_content_development")
 async def python_content_development(curriculum) -> JSONResponse:
 
+    """
+    CURRICULUM FORMAT
+
+    {
+    "title": "title of the course",
+    "curriculum": {
+      "module1": [
+        list of subtopics for module1
+      ],
+      "module2": [
+        list of subtopics for module2
+      ]
+    }
+  }
+    """
+
     start_time = time.time()
     total_usage, gpt_cost = await python_content_class.content_pipeline2(curriculum, STORAGE)
 
