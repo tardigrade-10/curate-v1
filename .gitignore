@@ -3,7 +3,7 @@ __pycache__
 
 core/libs/
 core/test_data/
-core/features/experimental
+core/features/experimental/
 
 
 # secrets

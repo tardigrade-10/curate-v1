@@ -8,7 +8,11 @@ import aiofiles
 import json
 
 from core.features.content_development.python.python_content import PythonContentGeneration 
+from core.features.content_development.python.tableau import TableauContentGeneration 
 from core.features.utils import pdf_to_images
+from dotenv import load_dotenv
+load_dotenv()
+STORAGE = os.getenv("STORAGE_PATH")
 
 router = APIRouter(
     prefix="/content_development",
@@ -16,9 +20,9 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+# initiate the classes inside the functions directly to remove previous states
 python_content_class = PythonContentGeneration()
-
-STORAGE = r"C:\Users\DELL\Documents\Curate\curate-v1\core\storage"
+tableau_content_class = TableauContentGeneration()
 
 def file_management(file, file_ext):
     file_id = str(uuid4())
@@ -86,6 +90,38 @@ async def python_content_development(curriculum) -> JSONResponse:
 
     start_time = time.time()
     total_usage, gpt_cost = await python_content_class.content_pipeline2(curriculum, STORAGE)
+
+    # Constructing the response
+    latency = f"{round(time.time() - start_time, 2)} s"
+    response = {
+        "curriculum": json.loads(curriculum),
+        "total_usage": total_usage,
+        "gpt_cost": gpt_cost,
+        "latency": latency
+    }
+    return JSONResponse(content=response)
+
+@router.post("/tableau_content_development")
+async def tableau_content_development(curriculum) -> JSONResponse:
+
+    """
+    CURRICULUM FORMAT
+
+    {
+    "title": "title of the course",
+    "curriculum": {
+      "module1": [
+        list of subtopics for module1
+      ],
+      "module2": [
+        list of subtopics for module2
+      ]
+    }
+  }
+    """
+
+    start_time = time.time()
+    total_usage, gpt_cost = await tableau_content_class.content_pipeline2(curriculum, STORAGE)
 
     # Constructing the response
     latency = f"{round(time.time() - start_time, 2)} s"

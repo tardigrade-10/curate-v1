@@ -9,6 +9,10 @@ import aiofiles
 from core.features.htp import HTPService
 from core.features.utils import pdf_to_images
 
+from dotenv import load_dotenv
+load_dotenv()
+STORAGE = os.getenv("STORAGE_PATH")
+
 router = APIRouter(
     prefix="/htp",
     tags=["htp"],
@@ -17,7 +21,6 @@ router = APIRouter(
 
 htp_service = HTPService()
 
-STORAGE = r"C:\Users\DELL\Documents\Curate\curate-v1\core\storage"
 
 def ignored_text(text, i_text):
     for t in i_text:

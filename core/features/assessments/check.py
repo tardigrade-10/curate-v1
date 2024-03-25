@@ -307,14 +307,23 @@ class AssignmentCheck:
         # reformation
         reformed = {}
         for file, qnas in files_qnas.items():
-            l = len(qnas)
-            for i in range(1, l//2 + 1):
-                reformed[file + "?" + f"q{i}"] = {
-                                        "question": qnas.get(f"q{i}"),
-                                        "description": context[f"q{i}"]['description'],
-                                        "max_marks": context[f"q{i}"]['max_marks'],
-                                        "solution": qnas.get(f"a{i}")
-                                    }
+            # l = len(qnas)
+            # for i in range(1, l//2 + 1):
+            #     reformed[file + "?" + f"q{i}"] = {
+            #                             "question": qnas.get(f"q{i}"),
+            #                             "description": context[f"q{i}"]['description'],
+            #                             "max_marks": context[f"q{i}"]['max_marks'],
+            #                             "solution": qnas.get(f"a{i}")
+            #                         }
+
+            for i in qnas.keys():
+                if i.startswith("q"):
+                    reformed[file + "?" + f"{i}"] = {
+                                            "question": qnas.get(f"{i}"),
+                                            "description": context[f"{i}"]['description'],
+                                            "max_marks": context[f"{i}"]['max_marks'],
+                                            "solution": qnas.get(f"{i.replace('q', 'a')}")
+                                        }
         
         # finding duplicates
         """
@@ -441,4 +450,8 @@ class AssignmentCheck:
             writer.writerow(row)
 
         return output.getvalue()
+    
+
+    def summarize_remarks(self, remarks: Dict, context: Dict):
+        pass
 

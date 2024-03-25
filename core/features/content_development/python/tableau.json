@@ -1,0 +1,17 @@
+{
+    "title": "title of the course",
+    "curriculum": {
+        "module1": {
+            "name": "name of module1",
+            "topics": [
+                "<list of topics>"
+            ]
+        },
+        "module2": {
+            "name": "name of module2",
+            "topics": [
+                "<list of topics>"
+            ]
+        }
+    }
+}

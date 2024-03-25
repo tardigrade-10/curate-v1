@@ -8,6 +8,10 @@ from typing import Dict, List
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter, File, UploadFile, HTTPException
 
+from dotenv import load_dotenv
+load_dotenv()
+ASSESSMENTS_STORAGE = os.getenv("STORAGE_PATH") + "assessments"
+
 from core.features.assessments.check import AssignmentCheck 
 
 router = APIRouter(
@@ -15,10 +19,6 @@ router = APIRouter(
     tags=["assessments"],
     responses={404: {"description": "Not found"}},
 )
-
-assessment_check = AssignmentCheck()
-
-ASSESSMENTS_STORAGE = r"C:\Users\DELL\Documents\Curate\curate-v1\core\storage\assessments"
 
 # def file_management(file, file_ext):
 #     file_id = str(uuid4())
@@ -56,6 +56,7 @@ async def assignment_assess(
     - **check_duplicates**: if True, will check for duplicate files in the folder
     """
 
+    assessment_check = AssignmentCheck()
     start_time = time.time()
     total_usage, gpt_cost, run_report, api_call_count = await assessment_check.batch_assessment_check(
                                                         path=path,

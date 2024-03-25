@@ -19,7 +19,9 @@ router = APIRouter(
 retrieval_text_service = RetrievalTextService()
 retrieval_image_service = RetrievalImageService()
 
-STORAGE = r"C:\Users\DELL\Documents\Curate\curate-v1\core\storage"
+from dotenv import load_dotenv
+load_dotenv()
+STORAGE = os.getenv("STORAGE_PATH")
 
 def file_management(file, file_ext):
     file_id = str(uuid4())
