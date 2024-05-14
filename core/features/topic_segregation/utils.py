@@ -12,7 +12,7 @@ def calculate_cost_gpt4_8k(token_usage):
 
     return cost
 
-def calculate_cost_gpt4_turbo(token_usage):
+def calculate_cost_gpt4_omni(token_usage):
     prompt = token_usage['prompt_tokens']
     completion = token_usage['completion_tokens']
 

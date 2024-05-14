@@ -4,7 +4,7 @@ import json
 import asyncio
 from typing import Any, List, Tuple, Dict
 
-from core.features.utils import calculate_cost_gpt4_turbo, add_dicts, ServiceCost, encode_images, process_for_json
+from core.features.utils import calculate_cost_gpt4_omni, add_dicts, ServiceCost, encode_images, process_for_json
 from core.features.htp.prompt import SIMPLE_GPT_BASED_HTP_PROMPT
 from core.features.provider import creator, async_creator, vision_model_defaults
 
@@ -85,7 +85,7 @@ class HTPService:
             result_dict[name] = text
             total_tokens = add_dicts(total_tokens, _tokens)
 
-        gpt_cost = calculate_cost_gpt4_turbo(total_tokens)
+        gpt_cost = calculate_cost_gpt4_omni(total_tokens)
 
         return result_dict, total_tokens, gpt_cost, serv_cost
 
@@ -103,6 +103,6 @@ class HTPService:
             result_dict[name] = text
             total_tokens = add_dicts(total_tokens, _tokens)
 
-        gpt_cost = calculate_cost_gpt4_turbo(total_tokens)
+        gpt_cost = calculate_cost_gpt4_omni(total_tokens)
 
         return result_dict, total_tokens, gpt_cost, serv_cost

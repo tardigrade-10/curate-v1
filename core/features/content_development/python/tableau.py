@@ -7,7 +7,7 @@ from typing import List, Dict, Any, Tuple, Union
 
 from core.features.content_development.python.prompts import SIMPLE_COURSE_GENERATION_PROMPT, JUPYTER_NOTEBOOK_TUTORIAL_PROMPT, JUPYTER_NOTEBOOK_TUTORIAL_PROMPT2, TABLEAU_JUPYTER_NOTEBOOK_TUTORIAL_PROMPT2
 from core.features.content_development.python import DEFAULT_IPYNB_TEMPLATE
-from core.features.utils import add_dicts, calculate_cost_gpt4_turbo
+from core.features.utils import add_dicts, calculate_cost_gpt4_omni
 from core.features.provider import async_creator, text_model_defaults
 
 from dotenv import load_dotenv
@@ -41,7 +41,7 @@ class TableauContentGeneration:
         response = response.model_dump()
         output = json.loads(response["choices"][0]["message"]["content"])
         total_usage = response["usage"]
-        gpt_cost = calculate_cost_gpt4_turbo(total_usage)
+        gpt_cost = calculate_cost_gpt4_omni(total_usage)
 
         curriculum_path = os.path.join(path, output['title'].replace(" ", "_") + ".json")
 
@@ -158,7 +158,7 @@ class TableauContentGeneration:
                 self.convert_to_jupyter_notebook(notebook_json, notebook_path)
                 previous_part = notebook_json
 
-        gpt_cost = calculate_cost_gpt4_turbo(total_tokens)
+        gpt_cost = calculate_cost_gpt4_omni(total_tokens)
         return total_tokens, gpt_cost
     
 
@@ -205,5 +205,5 @@ class TableauContentGeneration:
             os.makedirs(module_path, exist_ok=True)
             self.convert_to_jupyter_notebook(notebook_json, os.path.join(module_path, str(i+1) + "_" + topic.replace(" ", "_")))
 
-        gpt_cost = calculate_cost_gpt4_turbo(total_tokens)
+        gpt_cost = calculate_cost_gpt4_omni(total_tokens)
         return total_tokens, gpt_cost

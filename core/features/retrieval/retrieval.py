@@ -7,7 +7,7 @@ from tqdm import tqdm
 import fitz
 
 from core.features.retrieval.prompts import SIMPLE_INFO_RETRIEVAL_TEXT_PROMPT, SIMPLE_INFO_RETRIEVAL_IMAGE_PROMPT
-from core.features.utils import add_dicts, calculate_cost_gpt4_turbo, ServiceCost, encode_images, process_for_json
+from core.features.utils import add_dicts, calculate_cost_gpt4_omni, ServiceCost, encode_images, process_for_json
 from core.features.provider import async_creator, text_model_defaults, vision_model_defaults
 from dotenv import load_dotenv
 
@@ -136,7 +136,7 @@ class RetrievalTextService:
             total_tokens = add_dicts(total_tokens, result["total_usage"])
 
         result_with_query = {query: final_dict[index] for index, query in indexed_queries.items()}
-        gpt_cost = calculate_cost_gpt4_turbo(total_tokens)
+        gpt_cost = calculate_cost_gpt4_omni(total_tokens)
         serv_cost = service_cost.retrieval_service(input_len=input_len, queries_count=len(queries))
         return result_with_query, total_tokens, input_len, gpt_cost, serv_cost
 
@@ -198,6 +198,6 @@ class RetrievalImageService:
         result_with_query = {query: final_dict[index] for index, query in indexed_queries.items()}
 
         serv_cost = service_cost.retrieval_image_service(len(image_paths), len(queries))
-        gpt_cost = calculate_cost_gpt4_turbo(total_tokens)
+        gpt_cost = calculate_cost_gpt4_omni(total_tokens)
 
         return result_with_query, total_tokens, gpt_cost, serv_cost

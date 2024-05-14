@@ -4,7 +4,7 @@ import logging
 from typing import Dict, Any
 from dotenv import load_dotenv
 from core.features.provider import creator, text_creator_defaults
-from core.features.utils import calculate_cost_gpt4_turbo
+from core.features.utils import calculate_cost_gpt4_omni
 
 # Load environment variables
 load_dotenv()
@@ -62,7 +62,7 @@ class LanguageTranslator:
             raise
 
     def calculate_cost(self, usage_data: Dict[str, Any]) -> float:
-        return calculate_cost_gpt4_turbo(usage_data)
+        return calculate_cost_gpt4_omni(usage_data)
 
 
 # if __name__ == "__main__":

@@ -8,7 +8,7 @@ from tqdm import tqdm
 from typing import Dict
 
 from core.features.assessments.prompts import SIMPLE_ASSIGNMENT_CHECK_PROMPT
-from core.features.utils import add_dicts, calculate_cost_gpt4_turbo
+from core.features.utils import add_dicts, calculate_cost_gpt4_omni
 from core.features.provider import async_creator, text_model_defaults
 
 
@@ -282,7 +282,7 @@ class AssignmentCheck:
         with open(os.path.join(results_path, remarks_filename.replace('.json', '.csv')), 'w') as f:
             f.write(csv_remarks)
 
-        gpt_cost = calculate_cost_gpt4_turbo(total_tokens)
+        gpt_cost = calculate_cost_gpt4_omni(total_tokens)
         if check_duplicates:
             # saving the duplicate notebooks and qnas info  
             with open(os.path.join(results_path, 'duplicates.json'), 'w') as f:
